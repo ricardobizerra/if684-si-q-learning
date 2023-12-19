@@ -40,11 +40,25 @@ def reset_table():
             
         file.write(text)
         
+def save_table(table):
+    with open("resultado.txt", "w") as file:
+        text = ""
+        
+        for n in range(96):
+            for m in range(3):
+                if m < 2:
+                    text = f"{text}{table[n][m]} "
+                else:
+                    text = f"{text}{table[n][m]}\n"
+        
+        file.write(text)
+        
 #função responsável por atualizar a tabela, sendo x e y as cordenadas na matriz
 def q_update(q_table, x, y, reward, alfa, gama, max):
     if x < len(q_table) and y < len(q_table[x]): q_table[x][y] = (1 - alfa) * q_table[x][y] + (alfa * (reward + (gama * max)))
 
 q_table = recover_table()
+#reset_table()
 
 alfa = 0.25 # Taxa de aprendizagem
 gama = 0.50 # Taxa de desconto
@@ -52,13 +66,18 @@ epsilon = 0.1 # Epsilon value for epsilon-greedy policy
 
 act = ['jump','left','right']
 
-while True:
-    print('==============================')
-    estado, recompensa = con.get_state_reward(cn, rd.choice(act))
-    print(f'Estado: {estado} | Recompensa: {recompensa}')
+plataforma  = 0
 
-    plataforma, direcao = int(estado[:7],2), int(estado[7:],2)
-    print(f'Plataforma: {plataforma} | Direção: {direcao}')
+i = 0
+while i < 1000:
+    print('==============================')
+    
+    #colocar alfa como o valor padrão e randomizar epsilon nos primeiros testes
+    alfa = 0.25
+    if i < 50:
+        epsilon = rd.random()
+    else:
+        epsilon = 0.1
     
     # Epsilon-greedy policy
     if rd.random() < epsilon:
@@ -67,20 +86,19 @@ while True:
         action = act[np.argmax(q_table[plataforma])]  # Exploitation
     
     estado, recompensa = con.get_state_reward(cn, action)
-    plataforma_nova, direcao_nova = int(estado[:7],2), int(estado[7:],2)
+    print(f'Estado: {estado} | Recompensa: {recompensa}')
+
+    if recompensa < -100:
+        alfa = 0.05
+        
+    plataforma, direcao = int(estado[:7],2), int(estado[7:],2)
+    estado = (plataforma * 4) + (direcao % 4)
     
-    max_q_value = max(q_table[plataforma_nova])
+    max_q_value = max(q_table[plataforma])
     q_update(q_table, plataforma, direcao, recompensa, alfa, gama, max_q_value)   
         
     #salva os resultados atuais    
-    with open("resultado.txt", "w") as file:
-        text = ""
-        
-        for n in range(96):
-            for m in range(3):
-                if m < 2:
-                    text = f"{text}{q_table[n][m]} "
-                else:
-                    text = f"{text}{q_table[n][m]}\n"
-        
-        file.write(text)
+    save_table(q_table)
+    
+    #aumenta 1 no contador do loop principal
+    i += 1
