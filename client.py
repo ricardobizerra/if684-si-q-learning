@@ -59,11 +59,11 @@ def q_update(value, alfa, gama, reward, max):
     
 
 q_table = recover_table()
-#reset_table()
+reset_table()
 
 alfa = 0.25 # Taxa de aprendizagem
 gama = 0.50 # Taxa de desconto
-epsilon = 0.1 # Epsilon value for epsilon-greedy policy
+epsilon = 0 # Epsilon value for epsilon-greedy policy
 
 act = ['jump','left','right']
 
@@ -100,16 +100,18 @@ while i < 1000:
     if recompensa < -100:
         alfa = 0.05
         
-    plataforma, direcao = int(estado[:7],2), int(estado[7:],2)
+    plataforma, direcao = int(estado[2:7],2), int(estado[7:9],2)
     print(f'Plataforma: {plataforma} | direcao: {direcao}')
     estado_int = (plataforma * 4) + (direcao % 4)
     
-    max_q_value = max(q_table[plataforma])
+    max_q_value = max(q_table[estado_atual])
     current_q = q_update(q_table[estado_atual][action], alfa, gama, recompensa, max_q_value)   
         
     if (0 <= estado_int <= 300):
-        q_table[estado_atual][action] = current_q
-        save_table(q_table)
+        pass
+     
+    q_table[estado_atual][action] = current_q
+    save_table(q_table)
             
     estado_atual = estado_int
     
@@ -119,4 +121,3 @@ while i < 1000:
     
 #salva os resultados atuais    
 save_table(q_table)
-    
