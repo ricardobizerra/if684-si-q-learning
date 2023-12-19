@@ -54,8 +54,9 @@ def save_table(table):
         file.write(text)
         
 #função responsável por atualizar a tabela, sendo x e y as cordenadas na matriz
-def q_update(q_table, x, y, reward, alfa, gama, max):
-    if x < len(q_table) and y < len(q_table[x]): q_table[x][y] = (1 - alfa) * q_table[x][y] + (alfa * (reward + (gama * max)))
+def q_update(value, alfa, gama, reward, max):
+    return (1 - alfa) * value + (alfa * (reward + (gama * max)))
+    
 
 q_table = recover_table()
 #reset_table()
@@ -67,6 +68,7 @@ epsilon = 0.1 # Epsilon value for epsilon-greedy policy
 act = ['jump','left','right']
 
 plataforma  = 0
+estado_atual = 0
 
 i = 0
 while i < 1000:
@@ -74,31 +76,47 @@ while i < 1000:
     
     #colocar alfa como o valor padrão e randomizar epsilon nos primeiros testes
     alfa = 0.25
-    if i < 50:
-        epsilon = rd.random()
-    else:
-        epsilon = 0.1
+    
     
     # Epsilon-greedy policy
-    if rd.random() < epsilon:
-        action = rd.choice(act)  # Exploration
+    n_atual = rd.random()
+    if n_atual < epsilon:
+        action = rd.randint(0, 2)  # Exploration
     else:
-        action = act[np.argmax(q_table[plataforma])]  # Exploitation
-    
-    estado, recompensa = con.get_state_reward(cn, action)
-    print(f'Estado: {estado} | Recompensa: {recompensa}')
+        action = 0
+        val = 0
+        for n in range(3):
+            if n == 0:
+                val = q_table[estado_atual][n]
+            elif q_table[estado_atual][n] > val:
+                val = q_table[estado_atual][n]
+                action = n
+        # Exploitation
 
+    estado, recompensa = con.get_state_reward(cn, act[action])
+    print(f'Estado: {estado} | Recompensa: {recompensa}')
+    print(f'criterio:{n_atual} | ação: {action}')
+    
     if recompensa < -100:
         alfa = 0.05
         
     plataforma, direcao = int(estado[:7],2), int(estado[7:],2)
-    estado = (plataforma * 4) + (direcao % 4)
+    print(f'Plataforma: {plataforma} | direcao: {direcao}')
+    estado_int = (plataforma * 4) + (direcao % 4)
     
     max_q_value = max(q_table[plataforma])
-    q_update(q_table, plataforma, direcao, recompensa, alfa, gama, max_q_value)   
+    current_q = q_update(q_table[estado_atual][action], alfa, gama, recompensa, max_q_value)   
         
-    #salva os resultados atuais    
-    save_table(q_table)
+    if (0 <= estado_int <= 300):
+        q_table[estado_atual][action] = current_q
+        save_table(q_table)
+            
+    estado_atual = estado_int
     
     #aumenta 1 no contador do loop principal
     i += 1
+
+    
+#salva os resultados atuais    
+save_table(q_table)
+    
