@@ -63,7 +63,7 @@ reset_table()
 
 alfa = 0.25 # Taxa de aprendizagem
 gama = 0.50 # Taxa de desconto
-epsilon = 0 # Epsilon value for epsilon-greedy policy
+epsilon = 0.2 # Epsilon value for epsilon-greedy policy
 
 act = ['jump','left','right']
 
@@ -95,7 +95,7 @@ while i < 1000:
 
     estado, recompensa = con.get_state_reward(cn, act[action])
     print(f'Estado: {estado} | Recompensa: {recompensa}')
-    print(f'criterio:{n_atual} | ação: {action}')
+    #print(f'criterio:{n_atual} | ação: {action}')
     
     if recompensa < -100:
         alfa = 0.05
@@ -104,7 +104,7 @@ while i < 1000:
     print(f'Plataforma: {plataforma} | direcao: {direcao}')
     estado_int = (plataforma * 4) + (direcao % 4)
     
-    max_q_value = max(q_table[estado_atual])
+    max_q_value = max(q_table[estado_int])
     current_q = q_update(q_table[estado_atual][action], alfa, gama, recompensa, max_q_value)   
         
     if (0 <= estado_int <= 300):
@@ -121,3 +121,4 @@ while i < 1000:
     
 #salva os resultados atuais    
 save_table(q_table)
+    
