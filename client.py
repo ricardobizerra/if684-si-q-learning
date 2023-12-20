@@ -66,7 +66,7 @@ recover_table(q_table)
 
 alfa = 0.1 # Taxa de aprendizagem
 gama = 0.9 # Taxa de desconto
-epsilon = 0.6 # Epsilon value for epsilon-greedy policy
+epsilon = 0 # Epsilon value for epsilon-greedy policy
 
 act = ['jump','left','right']
 
@@ -102,8 +102,8 @@ while i < 1000:
     
     if recompensa < -100:
         alfa = 0.05
-    else:
-        epsilon *= 0.95
+    #else:
+    #    epsilon *= 0.95
         
     plataforma, direcao = int(estado[2:7],2), int(estado[7:9],2)
     print(f'Plataforma: {plataforma} | direcao: {direcao}')
