@@ -54,8 +54,8 @@ def save_table(table):
         file.write(text)
         
 #função responsável por atualizar a tabela, sendo x e y as cordenadas na matriz
-def q_update(value, alfa, gama, reward, max):
-    return (1 - alfa) * value + (alfa * (reward + (gama * max)))
+def q_update(value, alfa, gama, reward, maximum):
+    return (1 - alfa) * value + (alfa * (reward + (gama * maximum)))
     
 
 #reset_table()
@@ -64,9 +64,9 @@ init_table(q_table)
 recover_table(q_table)
 
 
-alfa = 0.25 # Taxa de aprendizagem
-gama = 0.50 # Taxa de desconto
-epsilon = 0.1 # Epsilon value for epsilon-greedy policy
+alfa = 0.1 # Taxa de aprendizagem
+gama = 0.9 # Taxa de desconto
+epsilon = 0.6 # Epsilon value for epsilon-greedy policy
 
 act = ['jump','left','right']
 
@@ -102,6 +102,8 @@ while i < 1000:
     
     if recompensa < -100:
         alfa = 0.05
+    else:
+        epsilon *= 0.95
         
     plataforma, direcao = int(estado[2:7],2), int(estado[7:9],2)
     print(f'Plataforma: {plataforma} | direcao: {direcao}')
